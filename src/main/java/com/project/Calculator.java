@@ -3,10 +3,18 @@ package com.project;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 class Calculator {
+    private static final String MAX_NUM = "При операции вычисления, максимальное используемое число у двух операндов, должно быть не более 10. Получено: %s";
+    private static int checkMaxValue(int operand, String romanNum) {
+        if (operand > 10)
+            throw new IllegalArgumentException(String.format(MAX_NUM, romanNum.equals("") ? operand : romanNum));
+        return operand;
+    }
+
     static class Roman {
-        private static final String NUMBER_NOT_EXIST = "Операнд содержит несуществующее число: %s";
+        private static final String NUMBER_NOT_EXIST = "Операнд содержит несуществующее число: %s. Ожидается от I до X";
         private static final Map<String, Integer> romanNumerals = new LinkedHashMap<>();
 
         static {
@@ -32,8 +40,8 @@ class Calculator {
                 try {
                     int firstNum = romanNumerals.get(String.valueOf(romanNum.charAt(romanNum.length() - 1)));
                     result += romanToArabic(romanNum, firstNum);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(String.format(NUMBER_NOT_EXIST, romanNum));
+                } catch (NullPointerException e) {
+                    throw new NoSuchElementException(String.format(NUMBER_NOT_EXIST, romanNum));
                 }
             }
             return arabicToRoman(result);
@@ -49,8 +57,8 @@ class Calculator {
                         result += romanToArabic(romanNum, firstNum);
                     else
                         result -= romanToArabic(romanNum, firstNum);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(String.format(NUMBER_NOT_EXIST, romanNum));
+                } catch (NullPointerException e) {
+                    throw new NoSuchElementException(String.format(NUMBER_NOT_EXIST, romanNum));
                 }
             }
             return arabicToRoman(result);
@@ -66,8 +74,8 @@ class Calculator {
                         result += romanToArabic(romanNum, firstNum);
                     else
                         result *= romanToArabic(romanNum, firstNum);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(String.format(NUMBER_NOT_EXIST, romanNum));
+                } catch (NullPointerException e) {
+                    throw new NoSuchElementException(String.format(NUMBER_NOT_EXIST, romanNum));
                 }
             }
             return arabicToRoman(result);
@@ -83,8 +91,8 @@ class Calculator {
                         result += romanToArabic(romanNum, firstNum);
                     else
                         result /= romanToArabic(romanNum, firstNum);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(String.format(NUMBER_NOT_EXIST, romanNum));
+                } catch (NullPointerException e) {
+                    throw new NoSuchElementException(String.format(NUMBER_NOT_EXIST, romanNum));
                 }
             }
             return arabicToRoman(result);
@@ -98,10 +106,13 @@ class Calculator {
                 else
                     convertNum += romanNumerals.get(String.valueOf(romanNum.charAt(j)));
             }
-            return convertNum;
+            return checkMaxValue(convertNum, romanNum);
         }
 
         private static String arabicToRoman(int arabicNum) {
+            if (arabicNum < 1)
+                throw new IllegalArgumentException("В римской системе счисления не может быть отрицательных чисел.");
+
             StringBuilder romanNum = new StringBuilder();
             for (Map.Entry<String, Integer> entry : romanNumerals.entrySet()) {
                 while (romanNumerals.get(entry.getKey()) <= arabicNum) {
@@ -118,22 +129,50 @@ class Calculator {
     }
 
     static class Arabic {
-        private final int maxInt = 10;
+        private static final String NUMBER_NOT_EXIST = "Операнд содержит несуществующее число: %s. Ожидается от 1 до 10.";
 
         public static String addition(List<String> expression) {
-            return null;
+            try {
+                int firstOperand = checkMaxValue(Integer.parseInt(expression.get(0)), "");
+                int secondOperand = checkMaxValue(Integer.parseInt(expression.get(2)), "");
+
+                return String.valueOf(firstOperand + secondOperand);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException(String.format(NUMBER_NOT_EXIST, e.getMessage()));
+            }
         }
 
         public static String subtraction(List<String> expression) {
-            return null;
+            try {
+                int firstOperand = checkMaxValue(Integer.parseInt(expression.get(0)), "");
+                int secondOperand = checkMaxValue(Integer.parseInt(expression.get(2)), "");
+
+                return String.valueOf(firstOperand - secondOperand);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException(String.format(NUMBER_NOT_EXIST, e.getMessage()));
+            }
         }
 
         public static String multiplication(List<String> expression) {
-            return null;
+            try {
+                int firstOperand = checkMaxValue(Integer.parseInt(expression.get(0)), "");
+                int secondOperand = checkMaxValue(Integer.parseInt(expression.get(2)), "");
+
+                return String.valueOf(firstOperand * secondOperand);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException(String.format(NUMBER_NOT_EXIST, e.getMessage()));
+            }
         }
 
         public static String division(List<String> expression) {
-            return null;
+            try {
+                int firstOperand = checkMaxValue(Integer.parseInt(expression.get(0)), "");
+                int secondOperand = checkMaxValue(Integer.parseInt(expression.get(2)), "");
+
+                return String.valueOf(firstOperand / secondOperand);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException(String.format(NUMBER_NOT_EXIST, e.getMessage()));
+            }
         }
     }
 }
