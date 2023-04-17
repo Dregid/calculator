@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 
 class Calculator {
     private static final String MAX_NUM = "При операции вычисления, максимальное используемое число у двух операндов, должно быть не более 10. Получено: %s";
+
     private static int checkMaxValue(int operand, String romanNum) {
         if (operand > 10)
             throw new IllegalArgumentException(String.format(MAX_NUM, romanNum.equals("") ? operand : romanNum));
@@ -15,6 +16,7 @@ class Calculator {
 
     static class Roman {
         private static final String NUMBER_NOT_EXIST = "Операнд содержит несуществующее число: %s. Ожидается от I до X";
+
         private static final Map<String, Integer> romanNumerals = new LinkedHashMap<>();
 
         static {
@@ -168,6 +170,8 @@ class Calculator {
             try {
                 int firstOperand = checkMaxValue(Integer.parseInt(expression.get(0)), "");
                 int secondOperand = checkMaxValue(Integer.parseInt(expression.get(2)), "");
+                if (firstOperand == 0 && secondOperand == 0)
+                    return "0";
 
                 return String.valueOf(firstOperand / secondOperand);
             } catch (NumberFormatException e) {
