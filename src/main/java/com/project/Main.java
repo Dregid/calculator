@@ -6,10 +6,11 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class Main {
     private final static String ILLEGAL_FORMAT = "Получен неверный формат выражения. Пример верного выражения: 1 + 1 или IV + V. Получено: %s\n" +
-            "Так-же у математического выражения должно быть только два операнда и один оператор.";
+            "Причина: у математического выражения должно быть только два операнда и один оператор.";
     private final static String DIFFERENT_NUMBER_SYSTEMS = "В выражении используются разные системы счисления: %s. " +
             "Калькулятор умеет работать только с арабскими или римскими цифрами одновременно";
     private final static String OPERATOR_NOT_EXIST = "Передан не допущенный оператор: %s";
@@ -20,7 +21,7 @@ public class Main {
             while (!(input = reader.readLine()).equals("")) {
                 System.out.println(calc(input));
             }
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println(e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -35,22 +36,24 @@ public class Main {
         return switch (operator) {
             case "+" -> isRoman ? Calculator.Roman.addition(expression) : Calculator.Arabic.addition(expression);
             case "-" -> isRoman ? Calculator.Roman.subtraction(expression) : Calculator.Arabic.subtraction(expression);
-            case "*" -> isRoman ? Calculator.Roman.multiplication(expression) : Calculator.Arabic.subtraction(expression);
+            case "*" -> isRoman ? Calculator.Roman.multiplication(expression) : Calculator.Arabic.multiplication(expression);
             case "/" -> isRoman ? Calculator.Roman.division(expression) : Calculator.Arabic.division(expression);
             default -> throw new IllegalArgumentException(String.format(OPERATOR_NOT_EXIST, operator));
         };
     }
 
-    public static boolean errorCheckExpressionAndIsRoman(List<String> expression, String input) {
+    private static boolean errorCheckExpressionAndIsRoman(List<String> expression, String input) {
         if (expression.size() != 3)
             throw new IllegalArgumentException(String.format(ILLEGAL_FORMAT, input));
 
         Map<String, Integer> romanNumerals = Calculator.Roman.getRomanNumerals();
+        String firstNum = expression.get(0);
+        String secondNum = expression.get(2);
 
-        if ((romanNumerals.containsKey(String.valueOf(expression.get(0).charAt(0))) && !romanNumerals.containsKey(String.valueOf(expression.get(2).charAt(0)))) ||
-                (!romanNumerals.containsKey(String.valueOf(expression.get(0).charAt(0))) && romanNumerals.containsKey(String.valueOf(expression.get(2).charAt(0)))))
+        if ((romanNumerals.containsKey(String.valueOf(firstNum.charAt(0))) && !romanNumerals.containsKey(String.valueOf(secondNum.charAt(0)))) ||
+                (!romanNumerals.containsKey(String.valueOf(firstNum.charAt(0))) && romanNumerals.containsKey(String.valueOf(secondNum.charAt(0)))))
             throw new IllegalArgumentException(String.format(DIFFERENT_NUMBER_SYSTEMS, input));
 
-        return romanNumerals.containsKey(String.valueOf(expression.get(0).charAt(0)));
+        return romanNumerals.containsKey(String.valueOf(firstNum.charAt(0)));
     }
 }
